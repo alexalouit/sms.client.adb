@@ -1,0 +1,6 @@
+{
+    "endpoint": "https://sms.api.alouit.fr/",
+    "token": "",
+    "phonenumber": "+3300000000",
+    "user-agent": "ADB Gateway"
+}
