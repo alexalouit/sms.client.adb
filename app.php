@@ -72,6 +72,17 @@ $result = request(
 if (!$result = json_decode($result, true))
     return false;
 
+// verify phone number
+$phonenumber = "+";
+$phonenumber .= exec(
+    "/usr/local/bin/adb shell service call iphonesubinfo 17 | awk '{print $6}' | grep -o '[0-9]' | tr -d '\n'"
+);
+
+if ($config['phonenumber'] != $phonenumber) {
+    print('invalid phone number');
+    return;
+}
+
 foreach ($result as $events) {
     foreach ($events as $event) {
         switch (@$event['event']) {
@@ -90,10 +101,13 @@ foreach ($result as $events) {
                     );
 
                     // send the sms
-                    exec(
+                    $output = exec(
                         '/usr/local/bin/adb shell service call isms 7 i32 0 s16 "null" ' .
                             's16 "' . $message['to'] . '" s16 "null" s16 "\'' . $message['message'] . '\'"'
                     );
+
+                    if ($output != "Result: Parcel(00000000    '....')")
+                        continue;
 
                     // set as send
                     request(
